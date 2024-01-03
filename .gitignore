@@ -1,2 +1,4 @@
 # remove the IDE configuration
-./worloader/.idea
+.idea
+*.db
+./build/wakunode*
