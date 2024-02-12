@@ -49,7 +49,7 @@ Once the requirements are installed, the compilation is pretty much straight for
 ```bash
 make -j4 nwakunode2
 ``` 
-_NOTE: the flag `-j4` is not stricktly necessary. However, this makes the compilation way faster as it uses the availabe cores of the CPU to speed up the compilation_
+_NOTE: the flag `-j4` is not strictly necessary. However, this makes the compilation way faster as it uses the availabe cores of the CPU to speed up the compilation_
 
 I compile it a few times, and it always took between 25 and 30 minutes:
 ```bash
@@ -75,7 +75,7 @@ bash ./run_nwaku_on_public.sh
 ```
 For further understanding of the metrics/requirements of the Waku node, I’ve exposed most of the metrics endpoints.
 
-_Note: If the database location uses a restricted path, it might require to run the `wakunode2` with sudo privileges. Be aware of changing the location of the database to the desired path.
+_Note: If the database location uses a restricted path, it might require to run the `wakunode2` with sudo privileges. Be aware of changing the location of the database to the desired path._
 
 ### 5. Monitoring Nwaku
 Thanks to the guidelines of the [`nwaku-compose`](https://github.com/waku-org/nwaku) repo, It’s very simple to expose and analyze any metrics that `wakunode2` exposes.
@@ -134,38 +134,39 @@ The node was left running for a little bit over 5 days (29/01/2024 to 02/02/2024
 The overal CPU usage of the node was fairly small, averaging a ~3% acros the 4 cores of the Raspi.
 ![total_cpu.png](figs/std/total_cpu.png)
 Despite it had sudden peaks that reached the 25-30% of the CPU, the workload is fairly maintained over the cores of the CPU.
-![cpu_per_core.png](figs%2Fstd%2Fcpu_per_core.png)
+![cpu_per_core.png](figs/std/cpu_per_core.png)
 
 ##### Memory 
 The memory usage on the other hand remained steady across the 5 days. Increasing from ~800MB of total memory usage at the (this measurement includes the entire memory usage of the raspi) to a ~950MB of usage at the end of the 5 days.
-![memory.png](figs%2Fstd%2Fmemory.png)
+![memory.png](figs/std/memory.png)
+_NOTE: please note that as `nwaku` doens't run on a docker, I can't isolate the memory usage by using `cadvisor`. Thus, the measured memory represents the one used at the machine level (OS + Prometheus + Grafana + Nwaku)_ 
 
 ##### Connectivity
 The node was connected to the public network on the main GossipSub channels. It managed to establish connections with 12 peers at the end of the run, only reaching the 0 peers connections in two occasions during the mornign of the 1st of February.
 Otherwise, it has shown fairly reasonable connectivity of an average peer connection count of 7,5 peers. 
-![connected_peers.png](figs%2Fstd%2Fconnected_peers.png)
+![connected_peers.png](figs/std/connected_peers.png)
 _Note: the Raspberry didn't have the ports open, which could jeopardize a bit the connectivity._ 
 
 ##### Traffic on the public Waku network
 As previously mentioned, the node was openly subscribed to the public Waku GossipSub topics. This means that it had to relay the network's traffic to its neighbours.
 The following graphs shows the ratio of messages/second that the Raspberry received over the 5 days. We can appreciate the over those first 3 days, the node was receiving 0.5 messages per second. Until the 1st of February, where the incoming messages drop to 0.
-![messages_per_seconds.png](figs%2Fstd%2Fmessages_per_seconds.png)
+![messages_per_seconds.png](figs/std/messages_per_seconds.png)
 On the other hand, the graph showing the average size of the received messages shows that the average size of the messages stayed over the 86MB. Even when there were no incoming messages for the last 2 days?
-![message_size.png](figs%2Fstd%2Fmessage_size.png)
+![message_size.png](figs/std/message_size.png)
 It looks like the dashboard is aggregating the size of all the messages and since no new messages arrived after the first three days, the dashboard doesn't change the average size afterward. 
 
 ##### RLN metrics
 Probably, the most expected metrics from the report, here are the RLN metrics gathered over the 5 days experiment.
 The node in the raspi registered 253 RLN memberships, which increased to 258 during the experiment.
-![rln_registered_memberships.png](figs%2Fstd%2Frln_registered_memberships.png)
+![rln_registered_memberships.png](figs/std/rln_registered_memberships.png)
 
 Those nodes, generating the message traffic previously mentioned, incurred a RLN proof verification time of the messages shown in the following graph.
 The graph shows that despite having heavy noise in the distribution, the average proof verification time stays on the order of 0.3 milliseconds.
 Once again, the sudden drop after the 1st of February catches my attention.
-![rln_proof_verification.png](figs%2Fstd%2Frln_proof_verification.png)
+![rln_proof_verification.png](figs/std/rln_proof_verification.png)
 
 On my attempt to find a possible cause of this behaviour at the beginning of february, I could spot that the number of `invalid_roots` started to increase right on the same time.
-![rln_invalid_messages.png](figs%2Fstd%2Frln_invalid_messages.png)
+![rln_invalid_messages.png](figs/std/rln_invalid_messages.png)
 I'm unsure if this might be a problem originated from the lack of connectivity, or if the lack of connectivity comes from the `invalid_roots`. 
 Further research on this aspect might be good to identify any misbehave of the network, or and edgy case in the node's operation.
 
@@ -190,26 +191,56 @@ The test were conducted on a home workstation with a Ryzen 5900X and 32GB of RAM
 I was able to spawn 50 nodes, later used to generate traffic on an increasing way. 
 
 The workload started from 20 nodes, and then it got increased to 40, then to 50, generating a total of 70.000 messages in an hour.
-![total_messages.png](figs%2Funder_load%2Ftotal_messages.png)
+![total_messages.png](figs/under_load/total_messages.png)
 
 ##### CPU
 The CPU usage showed a little bit more of activity this time. On the first part to the experiment (from 19:00 to 19:12), the CPU stayed on the range of 12% to 17%. Later on, when more messages were injected, it increased to a 20% to 27%, which is still reasonable.  
-![cpu_total.png](figs%2Funder_load%2Fcpu_total.png)
+![cpu_total.png](figs/under_load/cpu_total.png)
 Not many changes were spotted neither when looking at each CPU cores' workload, where the workload seemed to be fairly distributed.
-![cpu_per_core.png](figs%2Funder_load%2Fcpu_per_core.png)
+![cpu_per_core.png](figs/under_load/cpu_per_core.png)
 
 ##### Memory
 The memory chart on the other hand seems interesting. Despite it was steadily maintained at the 600MB mark, it is 300MB lower than when the node was connected to the public network with almost no interaction.
-![memory.png](figs%2Funder_load%2Fmemory.png)
+![memory.png](figs/under_load/memory.png)
 This might be the result of keeping remote peers' info in cache, though.
 
 ##### RLN metrics
 Coming back to the most relevant data, the experiment managed to put a message throughput of 13 messages/second first (from 20 nodes), and 20 to 22 messages/second later on with (40 and 50 nodes).
-![messages_per_second.png](figs%2Funder_load%2Fmessages_per_second.png)
+![messages_per_second.png](figs/under_load/messages_per_second.png)
 The provided message size was constant of 500Bytes, resulting on a proof verification time of under 0.2 seconds, with some edgy cases where the verification reached the 0.4 seconds. 
-![message_size.png](figs%2Funder_load%2Fmessage_size.png)
+![message_size.png](figs/under_load/message_size.png)
 
-![rln_proof_verification.png](figs%2Funder_load%2Frln_proof_verification.png)
+![rln_proof_verification.png](figs/under_load/rln_proof_verification.png)
+
+#### 6.3 Increased on message size
+As pointed by @alrevuelta, the message size used in the previous experiment might be too small to represent a "heavy" workload. 
+Thus, this third experiment aims to extend the 6.2 one by adding a larger message size, 16KB this time.
+
+As previously, the workload has been gradually increased over the first 15 minutes (20, 40 and 50 nodes), which ended up generating a total of 46.000 messages, now with a size of 16KB
+![total_messages.png](figs/under_load_16kb/total_messages.png)
+![message_size.png](figs/under_load_16kb/message_size.png)
+
+##### CPU
+Despite the noticeable increase on message size, the CPU has barely increased when compared with the previous experiment.
+![cpu_total.png](figs/under_load_16kb/cpu_total.png)
+The differences between the previous experiments and this one can be summarized in a 5% increase.
+![cpu_per_core.png](figs/under_load_16kb/cpu_per_core.png)
+
+##### Memory
+The memory usage, even if the message size got increase by 36 times, stayed pretty much steady, maintaining a 600MB usage.
+![memory.png](figs/under_load_16kb/memory.png)
+
+On my attempt to isolate the memory usage only to what `nwaku` is taking, I've used the following command:
+```bash 
+# in this case 16248 was the PID of wakunode2
+$ ps -o rss= -p 16248
+206740
+```
+which reports a 201.89MB.
+
+##### RLN 
+On the RLN side, there aren't many differences neither. The proof verification time remains at 0.2 seconds with just a few peaks that reach the 0.3 seconds.
+![rln_proof_verification_time.png](figs/under_load_16kb/rln_proof_verification_time.png)
 
 ### 7. Observations
 
