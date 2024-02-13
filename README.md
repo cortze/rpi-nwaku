@@ -47,7 +47,7 @@ This should leave you ready for the compilation.
 ### 3. Compilation of Nwaku
 Once the requirements are installed, the compilation is pretty much straight forward:
 ```bash
-make -j4 nwakunode2
+make -j4 wakunode2
 ``` 
 _NOTE: the flag `-j4` is not strictly necessary. However, this makes the compilation way faster as it uses the availabe cores of the CPU to speed up the compilation_
 
